@@ -1,3 +1,5 @@
+@file:OptIn(androidx.compose.animation.ExperimentalAnimationApi::class)
+
 package com.example.simpleauthapp
 
 import android.os.Bundle
@@ -6,7 +8,6 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.*
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -18,13 +19,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// Цвета в стиле Modern/Instagram
 val InstaGradient = Brush.verticalGradient(
     colors = listOf(Color(0xFF833AB4), Color(0xFFFD1D1D), Color(0xFFFCAF45))
 )
@@ -45,7 +46,7 @@ class MainActivity : ComponentActivity() {
                     ) { screen ->
                         when (screen) {
                             "welcome" -> WelcomeScreen { currentScreen = "auth" }
-                            "auth" -> AuthScreen(this)
+                            "auth" -> AuthScreen()
                         }
                     }
                 }
@@ -63,9 +64,11 @@ fun WelcomeScreen(onStart: () -> Unit) {
     ) {
         Text(
             text = "SottoGam",
-            fontSize = 42.sp,
-            fontWeight = FontWeight.Bold,
-            brush = InstaGradient
+            style = TextStyle(
+                brush = InstaGradient,
+                fontSize = 42.sp,
+                fontWeight = FontWeight.Bold
+            )
         )
         Text(
             text = "Будущее общения уже здесь",
@@ -107,7 +110,8 @@ fun AdvantageItem(icon: ImageVector, title: String, desc: String) {
 }
 
 @Composable
-fun AuthScreen(context: Context) {
+fun AuthScreen() {
+    val context = LocalContext.current
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isLogin by remember { mutableStateOf(true) }
