@@ -1,5 +1,3 @@
-@file:OptIn(androidx.compose.animation.ExperimentalAnimationApi::class)
-
 package com.example.simpleauthapp
 
 import android.os.Bundle
@@ -20,17 +18,20 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+// Градиент в стиле Instagram
 val InstaGradient = Brush.verticalGradient(
     colors = listOf(Color(0xFF833AB4), Color(0xFFFD1D1D), Color(0xFFFCAF45))
 )
 
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -55,6 +56,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalTextApi::class)
 @Composable
 fun WelcomeScreen(onStart: () -> Unit) {
     Column(
@@ -66,7 +68,7 @@ fun WelcomeScreen(onStart: () -> Unit) {
             text = "SottoGam",
             style = TextStyle(
                 brush = InstaGradient,
-                fontSize = 42.sp,
+                fontSize = 48.sp,
                 fontWeight = FontWeight.Bold
             )
         )
@@ -101,7 +103,12 @@ fun AdvantageItem(icon: ImageVector, title: String, desc: String) {
         modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(icon, contentDescription = null, tint = Color(0xFFE1306C), modifier = Modifier.size(32.dp))
+        Icon(
+            imageVector = icon, 
+            contentDescription = null, 
+            tint = Color(0xFFE1306C), 
+            modifier = Modifier.size(32.dp)
+        )
         Column(modifier = Modifier.padding(start = 16.dp)) {
             Text(title, fontWeight = FontWeight.Bold, fontSize = 16.sp)
             Text(desc, color = Color.Gray, fontSize = 14.sp)
@@ -134,7 +141,8 @@ fun AuthScreen() {
             onValueChange = { username = it },
             label = { Text("Логин") },
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(12.dp),
+            singleLine = true
         )
         Spacer(modifier = Modifier.height(12.dp))
         OutlinedTextField(
@@ -143,7 +151,8 @@ fun AuthScreen() {
             label = { Text("Пароль") },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(12.dp),
+            singleLine = true
         )
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -159,25 +168,33 @@ fun AuthScreen() {
                 if (isLogin) {
                     val savedPass = sharedPrefs.getString(username, null)
                     if (savedPass == password) {
-                        Toast.makeText(context, "Успешный вход!", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, "Успешный вход в SottoGam!", Toast.LENGTH_LONG).show()
                     } else {
-                        Toast.makeText(context, "Ошибка доступа", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Ошибка: неверный пароль", Toast.LENGTH_SHORT).show()
                     }
                 } else {
-                    sharedPrefs.edit().putString(username, password).apply()
-                    Toast.makeText(context, "Аккаунт создан!", Toast.LENGTH_SHORT).show()
-                    isLogin = true
+                    if (sharedPrefs.contains(username)) {
+                        Toast.makeText(context, "Логин уже занят", Toast.LENGTH_SHORT).show()
+                    } else {
+                        sharedPrefs.edit().putString(username, password).apply()
+                        Toast.makeText(context, "Аккаунт успешно создан!", Toast.LENGTH_SHORT).show()
+                        isLogin = true
+                    }
                 }
             }
         ) {
             Text(if (isLogin) "Войти" else "Зарегистрироваться", fontSize = 16.sp)
         }
 
-        TextButton(onClick = { isLogin = !isLogin }, modifier = Modifier.padding(top = 16.dp)) {
+        TextButton(
+            onClick = { isLogin = !isLogin }, 
+            modifier = Modifier.padding(top = 16.dp)
+        ) {
             Text(
-                if (isLogin) "Ещё нет аккаунта? Зарегистрируйтесь" 
-                else "Уже есть аккаунт? Войти",
-                color = Color(0xFF0095F6)
+                text = if (isLogin) "Ещё нет аккаунта? Зарегистрируйтесь" 
+                       else "Уже есть аккаунт? Войти",
+                color = Color(0xFF0095F6),
+                fontWeight = FontWeight.Medium
             )
         }
     }
